@@ -1,0 +1,24 @@
+﻿# Dependencies
+node_modules/
+**/node_modules/
+
+# Build
+dist/
+**/dist/
+build/
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+
+# Local node configs with keys - do not commit
+StealConfig.json
+OverWhiteListFI.json
+OverWhiteListRU.json
+
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
