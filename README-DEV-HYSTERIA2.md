@@ -34,6 +34,14 @@
 2. **БД — профили:** `remnawave-backend/prisma/schema.prisma` — модели `ConfigProfiles`, `ConfigProfileInbounds` (поле `config` / `rawInbound` Json). Расширение схемы или новый тип профиля — отдельная миграция Prisma.
 3. **Фронт:** формы профилей и хостов — в `remnawave-frontend` (поиск по `xray`, `ConfigProfile`).
 
+## Сделано в коде (первая итерация)
+
+- В **`remnawave-node`** добавлены модуль **`Hysteria2Module`** / **`Hysteria2Service`** (`src/modules/hysteria2/`) — пока **заглушка** (лог при `HYSTERIA2_ENABLED=true`, процесс Hysteria не запускается).
+- В **`config.schema.ts`** добавлена переменная **`HYSTERIA2_ENABLED`** (по умолчанию `false`).
+- В **`.env.sample`** добавлена строка `HYSTERIA2_ENABLED=false`.
+
+Дальше: запуск бинаря через supervisord, контракт с панелью, Prisma/UI — по этапам.
+
 ## Рекомендуемый порядок работ
 
 1. Создать **форк** на GitHub для `backend`, `node`, `frontend` (или монорепо-обёртку с submodules).

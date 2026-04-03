@@ -14,6 +14,10 @@ export const configSchema = z
             .string()
             .default('false')
             .transform((val) => val === 'true'),
+        HYSTERIA2_ENABLED: z
+            .string()
+            .default('false')
+            .transform((val) => val === 'true'),
         XTLS_API_PORT: z.string().transform((port) => {
             return parseInt(port, 10);
         }),
