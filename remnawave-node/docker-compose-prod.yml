@@ -14,3 +14,5 @@ services:
     environment:
       - NODE_PORT=2222
       - SECRET_KEY=""
+      # Cipherway fork: флаг заглушки Hysteria 2 (пока без отдельного процесса)
+      - HYSTERIA2_ENABLED=false

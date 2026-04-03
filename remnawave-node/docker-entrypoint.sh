@@ -55,7 +55,9 @@ export XRAY_CORE_VERSION
 echo "[Entrypoint] Xray version: $XRAY_CORE_VERSION"
 echo "[Ports] XTLS_API_PORT: $XTLS_API_PORT"
 
-
+if [ "${HYSTERIA2_ENABLED:-false}" = "true" ]; then
+    echo "[Features] HYSTERIA2_ENABLED=true (stub in Node — hysteria2 binary not managed yet)"
+fi
 
 echo "[Entrypoint] Executing command: $@"
 exec "$@"

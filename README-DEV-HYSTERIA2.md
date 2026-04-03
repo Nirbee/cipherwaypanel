@@ -53,3 +53,108 @@
 ## С сервера продакшена
 
 С сервера **не нужно** копировать образы Docker как исходники. Полезно сохранить **без секретов**: версии образов, `docker-compose.yml`, шаблон env, экспорт JSON профилей для тестов совместимости.
+
+---
+
+## Как тестировать изменения ноды
+
+Панель Remnawave в проде почти всегда крутится в **Docker**: вы меняете не «файлы на диске», а **образ контейнера** `remnanode`.
+
+### Вариант A: сборка образа локально (Linux / WSL2 / CI)
+
+Из каталога `remnawave-node`:
+
+```bash
+docker build -t cipherway-node:local .
+```
+
+Запуск с вашим `.env` (скопируйте из рабочего сервера только **не секретные** имена переменных и подставьте тестовый `SECRET_KEY` от панели в dev):
+
+```bash
+docker run --rm -it --network host \
+  -e NODE_PORT=2222 \
+  -e SECRET_KEY='...payload от панели...' \
+  -e HYSTERIA2_ENABLED=true \
+  cipherway-node:local
+```
+
+В логах контейнера должны быть строки:
+
+- `[Features] HYSTERIA2_ENABLED=true (stub in Node — hysteria2 binary not managed yet)` (из `docker-entrypoint.sh`);
+- `HYSTERIA2_ENABLED is true — integration stub loaded` (из Nest `Hysteria2Service`).
+
+При **`HYSTERIA2_ENABLED=false`** (или без переменной) этих сообщений не будет — поведение как у стоковой ноды.
+
+### Вариант B: только проверка TypeScript (Linux / WSL)
+
+```bash
+cd remnawave-node
+npm ci
+npm run build
+```
+
+На чистом Windows `npm ci` может падать на `nftables-napi` — используйте WSL2.
+
+### Вариант C: `docker-compose-local.yml`
+
+В `remnawave-node` подготовьте `.env` по образцу `.env.sample` и дополните переменными, которые ожидает ваша установка (см. документацию Remnawave). Затем:
+
+```bash
+docker compose -f docker-compose-local.yml build
+docker compose -f docker-compose-local.yml up
+```
+
+---
+
+## Как выкатить новую ноду на сервер с панелью
+
+**Не** копируйте папку `remnawave-node` поверх установленной панели вручную. Нода — отдельный контейнер; обновление = **новый образ** + **перезапуск** `remnanode`.
+
+### 1. Собрать образ с вашим кодом
+
+На машине с Docker (можно тот же сервер):
+
+```bash
+git clone https://github.com/Nirbee/cipherwaypanel.git
+cd cipherwaypanel/remnawave-node
+docker build -t ghcr.io/nirbee/cipherway-node:latest .
+```
+
+(Имя тега замените на свой реестр: GitHub Container Registry, Docker Hub и т.д.)
+
+### 2. Загрузить образ на сервер
+
+- **Через registry:** `docker push ...`, на сервере в `docker-compose` указать этот образ и сделать `docker compose pull && docker compose up -d`.
+- **Через сохранение файла:** `docker save ghcr.io/nirbee/cipherway-node:latest | ssh user@server docker load`.
+
+### 3. Правка `docker-compose` на сервере
+
+Найдите сервис **`remnanode`** (или как он назван у вас) и:
+
+1. Замените строку **`image:`** на ваш образ, например `ghcr.io/nirbee/cipherway-node:latest`.
+2. В **`environment:`** добавьте (опционально):
+
+   ```yaml
+   - HYSTERIA2_ENABLED=false
+   ```
+
+   Пока функция — только заглушка; **`false`** оставляет поведение как раньше.
+
+3. Сохраните **тот же** `SECRET_KEY` / `NODE_PORT` и остальные переменные, что были — иначе нода отвалится от панели.
+
+### 4. Перезапуск
+
+```bash
+cd /путь/к/compose
+docker compose pull   # если образ из registry
+docker compose up -d
+docker logs -f remnanode
+```
+
+### 5. Панель и backend
+
+Текущие изменения затрагивают **только ноду**. Образы **`remnawave/backend`** и **`remnawave/frontend`** менять **не нужно**, новых кнопок в UI пока нет. Когда появятся API и экраны — тогда соберёте и выкатите свои образы backend/frontend по той же схеме.
+
+### Откат
+
+Верните в compose официальный образ `remnawave/node:<версия>` и выполните `docker compose up -d` — как до эксперимента.
