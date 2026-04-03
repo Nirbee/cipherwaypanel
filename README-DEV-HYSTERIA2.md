@@ -1,5 +1,9 @@
 # Разработка интеграции Hysteria 2 с Remnawave (старт)
 
+## Подписки Hysteria 2 для NL (без нового кода панели)
+
+В upstream Remnawave **уже есть** поддержка Hysteria 2 в подписках и Xray-профилях. Пошаговая инструкция и пример inbound: **[HYSTERIA2_SUBSCRIPTION_RU.md](HYSTERIA2_SUBSCRIPTION_RU.md)**.
+
 ## Ваш репозиторий (push сюда)
 
 - **Remote:** [https://github.com/Nirbee/cipherwaypanel.git](https://github.com/Nirbee/cipherwaypanel.git) (`origin`)
