@@ -1,5 +1,13 @@
 # Разработка интеграции Hysteria 2 с Remnawave (старт)
 
+## Ваш репозиторий (push сюда)
+
+- **Remote:** [https://github.com/Nirbee/cipherwaypanel.git](https://github.com/Nirbee/cipherwaypanel.git) (`origin`)
+- **Ветка:** `main`
+- В подпапках удалены вложенные `.git` (клоны upstream), чтобы всё было **одним монорепозиторием**.
+- Для подтягивания обновлений с оригинала можно добавить:  
+  `git remote add upstream https://github.com/remnawave/backend.git` (и аналогично для других репо при необходимости merge).
+
 ## Что уже скачано в эту папку
 
 | Каталог | Репозиторий | Назначение |
